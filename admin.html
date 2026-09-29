@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard - Gianverse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+    <h1>📊 Admin Dashboard</h1>
+    <p>Smart Campus Assistant</p>
+    <hr>
+    <h2>📋 Student Requests</h2>
+    <div id="requestCount"></div>
+    <div id="requests"></div>
+    <br>
+    <button onclick="clearRequests()">
+        🗑️ Clear All Requests
+    </button>
+    <br><br>
+    <a href="index.html">
+        ⬅ Back to Assistant
+    </a>
+</div>
+<script>
+// ==============================
+// SHOW REQUESTS
+// ==============================
+function showRequests() {
+    let box = document.getElementById("requests");
+    let countBox = document.getElementById("requestCount");
+    let requests = JSON.parse(
+        localStorage.getItem("requests") || "[]"
+    );
+    // Show total requests
+    countBox.innerHTML =
+        "<p><b>Total Requests:</b> " +
+        requests.length +
+        "</p>";
+    // No requests
+    if (requests.length === 0) {
+        box.innerHTML =
+            "<div class='bot'>" +
+            "📭 No requests available." +
+            "</div>";
+        return;
+    }
+    // Clear old content
+    box.innerHTML = "";
+    // Display every request
+    requests.forEach(function(request, index) {
+        let statusText = request.status || "Pending";
+        box.innerHTML +=
+            "<div class='bot'>" +
+            "<b>🎫 Ticket ID:</b> " +
+            (request.ticket || "Not Available") +
+            "<br><br>" +
+            "<b>📌 Type:</b> " +
+            (request.type || "Not Available") +
+            "<br><br>" +
+            "<b>📝 Request:</b> " +
+            (request.message || "No message") +
+            "<br><br>" +
+            "<b>📊 Status:</b> " +
+            statusText +
+            "<br><br>" +
+            "<b>📅 Date:</b> " +
+            (request.date || "Not Available") +
+            "<br><br>" +
+            // Resolve button
+            (
+                statusText !== "Resolved"
+                ?
+                "<button onclick='resolveRequest(" +
+                index +
+                ")'>" +
+                "✅ Mark as Resolved" +
+                "</button>"
+                :
+                "<button disabled>" +
+                "✅ Resolved" +
+                "</button>"
+            ) +
+            "</div>" +
+            "<br>";
+    });
+}
+// ==============================
+// RESOLVE REQUEST
+// ==============================
+function resolveRequest(index) {
+    let requests = JSON.parse(
+        localStorage.getItem("requests") || "[]"
+    );
+    if (!requests[index]) {
+        alert("Request not found.");
+        return;
+    }
+    requests[index].status = "Resolved";
+    localStorage.setItem(
+        "requests",
+        JSON.stringify(requests)
+    );
+    alert("✅ Request marked as resolved!");
+    showRequests();
+}
+// ==============================
+// CLEAR ALL REQUESTS
+// ==============================
+function clearRequests() {
+    let requests = JSON.parse(
+        localStorage.getItem("requests") || "[]"
+    );
+    if (requests.length === 0) {
+        alert("There are no requests to delete.");
+        return;
+    }
+    if (
+        confirm(
+            "⚠️ Are you sure you want to delete ALL requests?"
+        )
+    ) {
+        localStorage.removeItem("requests");
+        alert("🗑️ All requests have been deleted.");
+        showRequests();
+    }
+}
+// ==============================
+// LOAD DASHBOARD
+// ==============================
+showRequests();
+</script>
+</body>
+</html>
